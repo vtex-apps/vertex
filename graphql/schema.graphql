@@ -1,0 +1,25 @@
+type Query {
+  getAppSettings: SettingsResponse @cacheControl(scope: PRIVATE)
+}
+
+type Mutation {
+  saveAppSettings(
+    clientId: String
+    clientToken: String
+    apiKey: String
+    apiPassword: String
+    force: Boolean
+  ): MutationResponse @cacheControl(scope: PRIVATE)
+}
+
+type MutationResponse {
+  status: String
+  message: String
+}
+
+type SettingsResponse {
+  clientId: String
+  clientToken: String
+  apiKey: String
+  apiPassword: String
+}

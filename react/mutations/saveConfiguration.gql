@@ -1,0 +1,6 @@
+mutation save($clientId: String, $clientToken: String, $apiKey: String, $apiPassword: String, $force: Boolean) {
+  saveAppSettings(clientId: $clientId, clientToken: $clientToken, apiKey: $apiKey, apiPassword: $apiPassword, force: $force) {
+   	status
+    message
+  }
+}

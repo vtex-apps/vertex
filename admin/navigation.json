@@ -1,0 +1,7 @@
+{
+  "section": "other",
+  "path": "/admin/vertex",
+  "icon": "extensions-ic",
+  "titleId": "admin/vertex.navigation.label",
+  "searchKeyWordsHelpers": "admin/vertex.navigation.keywords"
+}

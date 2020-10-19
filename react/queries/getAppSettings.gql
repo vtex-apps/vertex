@@ -1,0 +1,8 @@
+query GetAppSettings {
+  getAppSettings {
+    clientId
+    clientToken
+    apiPassword
+    apiKey
+  }
+}

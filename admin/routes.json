@@ -1,0 +1,6 @@
+{
+  "admin.app.vertex": {
+    "component": "VertexConfig",
+    "path": "/admin/app/vertex"
+  }
+}

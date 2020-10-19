@@ -1,0 +1,18 @@
+{
+  "admin/vertex.navigation.label": "admin/vertex.navigation.label",
+  "admin/vertex.navigation.keywords": "admin/vertex.navigation.keywords",
+  "admin/vextex.title": "admin/vextex.title",
+  "admin/vextex.alert.success": "admin/vextex.alert.success",
+  "admin/vextex.alert.error": "admin/vextex.alert.error",
+  "admin/vextex.alert.conflict": "admin/vextex.alert.conflict",
+  "admin/vextex.alert.yes": "admin/vextex.alert.yes",
+  "admin/vextex.alert.no": "admin/vextex.alert.no",
+  "admin/vextex.description": "admin/vextex.description",
+  "admin/vertex.configuration.title": "admin/vertex.configuration.title",
+  "admin/vertex.configuration.titleHelper": "admin/vertex.configuration.titleHelper",
+  "admin/vertex.configuration.clientId": "admin/vertex.configuration.clientId",
+  "admin/vertex.configuration.clientToken": "admin/vertex.configuration.clientToken",
+  "admin/vertex.configuration.apiKey": "admin/vertex.configuration.apiKey",
+  "admin/vertex.configuration.apiPassword": "admin/vertex.configuration.apiPassword",
+  "admin/vertex.configuration.save": "admin/vertex.configuration.save"
+}
