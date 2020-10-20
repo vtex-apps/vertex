@@ -18,9 +18,12 @@ export const resolvers = {
       const {
         clients: { vertex },
       } = ctx
+      const apps = new Apps(ctx.vtex)
+      const app: string = getAppId()
+      const settings = await apps.getAppSettings(app)
 
       // eslint-disable-next-line @typescript-eslint/camelcase
-      const { access_token } = await vertex.getToken()
+      const { access_token } = await vertex.getToken(settings)
 
       const dummyData = {
         saleMessageType: 'QUOTATION',
