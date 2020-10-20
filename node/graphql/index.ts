@@ -1,9 +1,11 @@
 /* eslint-disable no-console */
-import { Apps, ServiceContext } from '@vtex/api'
+import { Apps } from '@vtex/api'
 
 import {
   getCheckoutConfiguration,
   activateCheckoutConfiguration,
+  deactivateCheckoutConfiguration,
+  checkConfiguration,
 } from '../resources/checkout'
 
 const getAppId = (): string => {
@@ -12,15 +14,121 @@ const getAppId = (): string => {
 
 export const resolvers = {
   Routes: {
-    orderTaxHandler: async (ctx: ServiceContext) => {
+    orderTaxHandler: async (ctx: any) => {
+      const {
+        clients: { vertex },
+      } = ctx
+
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      const { access_token } = await vertex.getToken()
+
+      const dummyData = {
+        saleMessageType: 'QUOTATION',
+        seller: {
+          company: 'COMPANY',
+        },
+        lineItems: [
+          {
+            seller: {
+              physicalOrigin: {
+                taxAreaId: 391013000,
+              },
+            },
+            customer: {
+              customerCode: {
+                classCode: 'custclass',
+                value: 'cust',
+              },
+              destination: {
+                streetAddress1: '2301 Renaissance Blvd',
+                streetAddress2: 'Suite 100',
+                city: 'King of Prussia',
+                mainDivision: 'PA',
+                postalCode: '19406',
+                country: 'UNITED STATES',
+              },
+            },
+            product: {
+              productClass: 'PRODCLASS',
+              value: 'PRODCODE',
+            },
+            quantity: {
+              value: 10,
+            },
+            unitPrice: 10,
+            flexibleFields: {
+              flexibleCodeFields: [
+                {
+                  fieldId: 1,
+                  value: 'FLEXCodeField1',
+                },
+              ],
+              flexibleNumericFields: [
+                {
+                  fieldId: 1,
+                  value: 111,
+                },
+              ],
+              flexibleDateFields: [
+                {
+                  fieldId: 1,
+                  value: '2020-04-18',
+                },
+              ],
+            },
+            lineItemNumber: 1,
+            deliveryTerm: 'FOB',
+          },
+          {
+            seller: {
+              physicalOrigin: {
+                taxAreaId: 391013000,
+              },
+            },
+            customer: {
+              customerCode: {
+                classCode: 'custclass',
+                value: 'cust',
+              },
+              destination: {
+                streetAddress1: '2301 Renaissance Blvd',
+                streetAddress2: 'Suite 100',
+                city: 'King of Prussia',
+                mainDivision: 'PA',
+                postalCode: '19406',
+                country: 'UNITED STATES',
+              },
+            },
+            product: {
+              productClass: 'SHIPPINGCLASS',
+              value: 'SHIPPING',
+            },
+            quantity: {
+              value: 1,
+            },
+            extendedPrice: 20,
+            lineItemNumber: 2,
+          },
+        ],
+        documentNumber: 'billtest',
+        documentDate: '2020-04-18',
+        transactionType: 'SALE',
+      }
+
+      const quote = await vertex.simulateTax(access_token, dummyData)
+
+      console.log('Token =>', access_token)
+
       ctx.set('Content-Type', 'application/vnd.vtex.checkout.minicart.v1+json')
 
       console.log('orderTaxHandler =>', ctx)
 
-      ctx.response.body = JSON.stringify({
-        itemTaxResponse: [],
-        hooks: [],
-      })
+      // ctx.response.body = JSON.stringify({
+      //   itemTaxResponse: [],
+      //   hooks: [],
+      // })
+      ctx.response.body = JSON.stringify(quote)
+
       ctx.response.status = 200
     },
   },
@@ -52,8 +160,15 @@ export const resolvers = {
       }
       return ret
     },
+    deactivate: async (_: any, __: any, ctx: any) => {
+      deactivateCheckoutConfiguration(ctx.vtex.account, ctx.vtex.authToken)
+      return true
+    },
   },
   Query: {
+    checkConfiguration: async (_: any, __: any, ctx: any) => {
+      return checkConfiguration(ctx.vtex.account, ctx.vtex.authToken)
+    },
     getAppSettings: async (_: any, __: any, ctx: any) => {
       const apps = new Apps(ctx.vtex)
       const app: string = getAppId()

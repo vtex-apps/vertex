@@ -2,10 +2,11 @@
   "name": "vtex.checkout-ui-custom",
   "version": "0.0.17",
   "dependencies": {
+    "@vtex/api": "6.36.3",
     "co-body": "^6.0.0",
     "jsonwebtoken": "^8.5.0",
-    "ramda": "^0.25.0",
-    "@vtex/api": "6.36.3"
+    "qs": "^6.9.4",
+    "ramda": "^0.25.0"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.25",
@@ -19,7 +20,8 @@
     "tslint-config-prettier": "^1.18.0",
     "tslint-config-vtex": "^2.1.0",
     "typescript": "3.9.7",
-    "vtex.styleguide": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.126.0/public/@types/vtex.styleguide"
+    "vtex.styleguide": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.133.0/public/@types/vtex.styleguide",
+    "vtex.vertex": "https://vertex--sandboxusdev.myvtex.com/_v/private/typings/linked/v1/vtex.vertex@0.0.0+build1603225946/public/@types/vtex.vertex"
   },
   "scripts": {
     "lint": "tsc --noEmit && tslint -c tslint.json './**/*.ts'"

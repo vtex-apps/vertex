@@ -1,8 +1,10 @@
 type Query {
   getAppSettings: SettingsResponse @cacheControl(scope: PRIVATE)
+  checkConfiguration: Boolean @cacheControl(scope: PRIVATE)
 }
 
 type Mutation {
+  deactivate: String @cacheControl(scope: PRIVATE)
   saveAppSettings(
     clientId: String
     clientToken: String

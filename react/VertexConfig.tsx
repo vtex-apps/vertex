@@ -18,7 +18,9 @@ import {
 } from 'vtex.styleguide'
 
 import saveMutation from './mutations/saveConfiguration.gql'
+import deactivateMutation from './mutations/deactivate.gql'
 import GET_CONFIG from './queries/getAppSettings.gql'
+import CHECK from './queries/checkConfiguration.gql'
 
 import './styles.global.css'
 
@@ -41,6 +43,15 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
     apiKey: null,
     apiPassword: null,
   })
+
+  const [
+    deactivate,
+    {
+      loading: loadingDeactivate,
+      called: calledDeactivate,
+      error: errorDeactivate,
+    },
+  ] = useMutation(deactivateMutation)
 
   const [
     saveConfig,
@@ -72,8 +83,7 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
     },
   })
 
-  console.log('Mutation =>', loadingSave, calledSave, errorSave, saveData)
-  console.log('Loading =>', loading)
+  const { data: dataCheck } = useQuery(CHECK)
 
   const handleChange = (value: string, key: string) => {
     setState({
@@ -126,7 +136,21 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
         <PageHeader
           title={<FormattedMessage id="admin/vextex.title" />}
           subtitle={<FormattedMessage id="admin/vextex.description" />}
-        />
+        >
+          {dataCheck?.checkConfiguration &&
+            (!calledDeactivate || (calledDeactivate && errorDeactivate)) && (
+              <Button
+                variation="danger-tertiary"
+                size="small"
+                isLoading={loadingDeactivate}
+                onClick={() => {
+                  deactivate()
+                }}
+              >
+                <FormattedMessage id="admin/vextex.deactivate" />
+              </Button>
+            )}
+        </PageHeader>
       }
     >
       <PageBlock

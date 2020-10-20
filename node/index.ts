@@ -4,6 +4,8 @@ import {
   ServiceContext,
   ParamsContext,
   RecorderState,
+  AuthType,
+  LRUCache,
 } from '@vtex/api'
 
 import { Clients } from './clients'
@@ -15,10 +17,17 @@ const defaultClientOptions = {
   retries: 1,
   timeout: TIMEOUT_MS,
 }
+
+const memoryCache = new LRUCache<string, any>({ max: 1000 })
+
 const clients: ClientsConfig<Clients> = {
   implementation: Clients,
   options: {
     default: defaultClientOptions,
+    vertex: {
+      authType: AuthType.bearer,
+      memoryCache,
+    },
   },
 }
 

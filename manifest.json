@@ -29,6 +29,20 @@
         "host": "{{account}}.vtexcommercestable.com.br",
         "path": "/api/checkout/pvt/configuration/orderForm"
       }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "auth.vertexsmb.com",
+        "path": "/identity/connect/token"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "restconnect.vertexsmb.com",
+        "path": "/vertex-restapi/v1/sale"
+      }
     }
   ],
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
