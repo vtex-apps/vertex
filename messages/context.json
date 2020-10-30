@@ -11,6 +11,7 @@
   "admin/vextex.description": "admin/vextex.description",
   "admin/vertex.configuration.title": "admin/vertex.configuration.title",
   "admin/vertex.configuration.titleHelper": "admin/vertex.configuration.titleHelper",
+  "admin/vertex.configuration.companyCode": "admin/vertex.configuration.companyCode",
   "admin/vertex.configuration.clientId": "admin/vertex.configuration.clientId",
   "admin/vertex.configuration.clientToken": "admin/vertex.configuration.clientToken",
   "admin/vertex.configuration.apiKey": "admin/vertex.configuration.apiKey",

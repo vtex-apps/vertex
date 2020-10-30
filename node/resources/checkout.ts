@@ -18,9 +18,8 @@ const taxCalculationUrl = (account: string) =>
 
 const checkoutHeaders = (adminToken: string) => ({
   Accept: 'application/json',
-  Authorization: `bearer ${adminToken}`,
+  VtexIdclientAutCookie: `${adminToken}`,
   'Content-Type': 'application/json',
-  'X-Vtex-Use-Https': 'true',
 })
 
 export async function getCheckoutConfiguration(

@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { json } from 'co-body'
 import { Apps } from '@vtex/api'
 
 import {
@@ -7,6 +8,7 @@ import {
   deactivateCheckoutConfiguration,
   checkConfiguration,
 } from '../resources/checkout'
+import { fromVertex, toVertex } from '../resources/vertex'
 
 const getAppId = (): string => {
   return process.env.VTEX_APP_ID ?? ''
@@ -18,119 +20,30 @@ export const resolvers = {
       const {
         clients: { vertex },
       } = ctx
-      const apps = new Apps(ctx.vtex)
-      const app: string = getAppId()
-      const settings = await apps.getAppSettings(app)
+      const checkoutItens = await json(ctx.req)
+      let response = JSON.stringify({
+        itemTaxResponse: [],
+        hooks: [],
+      })
 
-      // eslint-disable-next-line @typescript-eslint/camelcase
-      const { access_token } = await vertex.getToken(settings)
+      if (checkoutItens?.shippingDestination?.postalCode) {
+        const apps = new Apps(ctx.vtex)
+        const app: string = getAppId()
+        const settings = await apps.getAppSettings(app)
 
-      const dummyData = {
-        saleMessageType: 'QUOTATION',
-        seller: {
-          company: 'COMPANY',
-        },
-        lineItems: [
-          {
-            seller: {
-              physicalOrigin: {
-                taxAreaId: 391013000,
-              },
-            },
-            customer: {
-              customerCode: {
-                classCode: 'custclass',
-                value: 'cust',
-              },
-              destination: {
-                streetAddress1: '2301 Renaissance Blvd',
-                streetAddress2: 'Suite 100',
-                city: 'King of Prussia',
-                mainDivision: 'PA',
-                postalCode: '19406',
-                country: 'UNITED STATES',
-              },
-            },
-            product: {
-              productClass: 'PRODCLASS',
-              value: 'PRODCODE',
-            },
-            quantity: {
-              value: 10,
-            },
-            unitPrice: 10,
-            flexibleFields: {
-              flexibleCodeFields: [
-                {
-                  fieldId: 1,
-                  value: 'FLEXCodeField1',
-                },
-              ],
-              flexibleNumericFields: [
-                {
-                  fieldId: 1,
-                  value: 111,
-                },
-              ],
-              flexibleDateFields: [
-                {
-                  fieldId: 1,
-                  value: '2020-04-18',
-                },
-              ],
-            },
-            lineItemNumber: 1,
-            deliveryTerm: 'FOB',
-          },
-          {
-            seller: {
-              physicalOrigin: {
-                taxAreaId: 391013000,
-              },
-            },
-            customer: {
-              customerCode: {
-                classCode: 'custclass',
-                value: 'cust',
-              },
-              destination: {
-                streetAddress1: '2301 Renaissance Blvd',
-                streetAddress2: 'Suite 100',
-                city: 'King of Prussia',
-                mainDivision: 'PA',
-                postalCode: '19406',
-                country: 'UNITED STATES',
-              },
-            },
-            product: {
-              productClass: 'SHIPPINGCLASS',
-              value: 'SHIPPING',
-            },
-            quantity: {
-              value: 1,
-            },
-            extendedPrice: 20,
-            lineItemNumber: 2,
-          },
-        ],
-        documentNumber: 'billtest',
-        documentDate: '2020-04-18',
-        transactionType: 'SALE',
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        const { access_token } = await vertex.getToken(settings)
+
+        const vertexJson = toVertex(checkoutItens, 'QUOTATION', settings)
+
+        const quote = await vertex.submitTax(access_token, vertexJson)
+
+        response = JSON.stringify(fromVertex(quote))
       }
-
-      const quote = await vertex.simulateTax(access_token, dummyData)
-
-      console.log('Token =>', access_token)
 
       ctx.set('Content-Type', 'application/vnd.vtex.checkout.minicart.v1+json')
 
-      console.log('orderTaxHandler =>', ctx)
-
-      // ctx.response.body = JSON.stringify({
-      //   itemTaxResponse: [],
-      //   hooks: [],
-      // })
-      ctx.response.body = JSON.stringify(quote)
+      ctx.response.body = response
 
       ctx.response.status = 200
     },
@@ -139,8 +52,21 @@ export const resolvers = {
     saveAppSettings: async (_: any, params: any, ctx: any) => {
       const apps = new Apps(ctx.vtex)
       const app: string = getAppId()
-      const { clientId, clientToken, apiKey, apiPassword, force } = params
-      const newSettings = { clientId, clientToken, apiKey, apiPassword }
+      const {
+        clientId,
+        companyCode,
+        clientToken,
+        apiKey,
+        apiPassword,
+        force,
+      } = params
+      const newSettings = {
+        clientId,
+        companyCode,
+        clientToken,
+        apiKey,
+        apiPassword,
+      }
       let ret = { status: 'success', message: '' }
 
       const config = await getCheckoutConfiguration(
@@ -149,7 +75,11 @@ export const resolvers = {
       )
 
       // If not forced and has a conflicted configuration
-      if (!force && config?.taxConfiguration?.url.indexOf('vertex') === -1) {
+      if (
+        !force &&
+        !!config?.taxConfiguration?.url &&
+        config?.taxConfiguration?.url.indexOf('vertex') === -1
+      ) {
         ret = {
           status: 'conflict',
           message: 'admin/vextex.alert.conflict',

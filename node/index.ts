@@ -6,10 +6,12 @@ import {
   RecorderState,
   AuthType,
   LRUCache,
+  EventContext,
 } from '@vtex/api'
 
 import { Clients } from './clients'
 import { resolvers } from './graphql'
+import { orderStatusChange } from './middlewares/orderStatusChange'
 
 const TIMEOUT_MS = 2000
 
@@ -34,6 +36,17 @@ const clients: ClientsConfig<Clients> = {
 declare global {
   type Context = ServiceContext<Clients>
 
+  interface StatusChangeContext extends EventContext<Clients> {
+    body: {
+      domain: string
+      orderId: string
+      currentState: string
+      lastState: string
+      currentChangeDate: string
+      lastChangeDate: string
+    }
+  }
+
   interface State {
     code: number
   }
@@ -48,4 +61,7 @@ export default new Service<Clients, RecorderState, ParamsContext>({
     },
   },
   routes: resolvers.Routes,
+  events: {
+    orderStatusChange,
+  },
 })

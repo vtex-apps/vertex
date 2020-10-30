@@ -1,6 +1,20 @@
-mutation save($clientId: String, $clientToken: String, $apiKey: String, $apiPassword: String, $force: Boolean) {
-  saveAppSettings(clientId: $clientId, clientToken: $clientToken, apiKey: $apiKey, apiPassword: $apiPassword, force: $force) {
-   	status
+mutation save(
+  $clientId: String
+  $companyCode: String
+  $clientToken: String
+  $apiKey: String
+  $apiPassword: String
+  $force: Boolean
+) {
+  saveAppSettings(
+    clientId: $clientId
+    companyCode: $companyCode
+    clientToken: $clientToken
+    apiKey: $apiKey
+    apiPassword: $apiPassword
+    force: $force
+  ) {
+    status
     message
   }
 }

@@ -7,19 +7,14 @@ export default class RequestVertex extends ExternalClient {
     super(``, context, options)
   }
 
-  public authToken() {
-    return this.context.authToken
-  }
+  public submitTax(token: any, data: any) {
+    console.log('submitTax => ', {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
 
-  public account() {
-    return this.context.account
-  }
-
-  public currentWorkspace() {
-    return this.context.workspace
-  }
-
-  public simulateTax(token: any, data: any) {
     return this.http.post(
       `https://restconnect.vertexsmb.com/vertex-restapi/v1/sale`,
       data,

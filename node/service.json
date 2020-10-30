@@ -8,5 +8,12 @@
       "path": "/vertex/checkout/order-tax",
       "public": true
     }
+  },
+  "workers": 1,
+  "events": {
+    "orderStatusChange": {
+      "sender": "vtex.orders-broadcast",
+      "topics": ["invoiced"]
+    }
   }
 }

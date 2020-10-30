@@ -38,6 +38,7 @@ const messages: any = defineMessages({
 const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
   const [state, setState] = useState<any>({
     isDialogOpen: false,
+    companyCode: null,
     clientId: null,
     clientToken: null,
     apiKey: null,
@@ -93,10 +94,11 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
   }
 
   const handleSave = () => {
-    const { clientId, clientToken, apiKey, apiPassword } = state
+    const { clientId, companyCode, clientToken, apiKey, apiPassword } = state
     saveConfig({
       variables: {
         force: false,
+        companyCode,
         clientId,
         clientToken,
         apiKey,
@@ -116,10 +118,11 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
   }
   const handleForceDialog = () => {
     handleDialogClose()
-    const { clientId, clientToken, apiKey, apiPassword } = state
+    const { clientId, companyCode, clientToken, apiKey, apiPassword } = state
     saveConfig({
       variables: {
         force: true,
+        companyCode,
         clientId,
         clientToken,
         apiKey,
@@ -161,6 +164,20 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
         variation="annotated"
       >
         <div className="w-100">
+          <div className="mb5">
+            <Input
+              type="text"
+              value={state.companyCode}
+              required
+              disabled={loadingSave || loading}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                handleChange(e.target.value, 'companyCode')
+              }}
+              label={
+                <FormattedMessage id="admin/vertex.configuration.companyCode" />
+              }
+            />
+          </div>
           <div className="mb5">
             <Input
               type="text"
@@ -221,6 +238,7 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
             <Button
               size="small"
               disabled={
+                !state.companyCode ||
                 !state.clientId ||
                 !state.clientToken ||
                 !state.apiKey ||

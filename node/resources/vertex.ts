@@ -1,74 +1,121 @@
-import axios from 'axios'
-import { path, prop, toString } from 'ramda'
-
-const client = axios.create({
-  timeout: 6000,
-})
-
-const checkoutUrl = (account: string) =>
-  `http://${account}.vtexcommercestable.com.br/api/checkout/pvt/configuration/orderForm`
-
-const taxCalculationUrlRegExp = (account: string) =>
-  new RegExp(
-    `https://(master--)?${account}.myvtex.com/vertex/checkout/order-tax/?`
-  )
-
-const taxCalculationUrl = (account: string) =>
-  `https://master--${account}.myvtex.com/vertex/checkout/order-tax/`
-
-const checkoutHeaders = (adminToken: string) => ({
-  Accept: 'application/json',
-  Authorization: `bearer ${adminToken}`,
-  'Content-Type': 'application/json',
-  'X-Vtex-Use-Https': 'true',
-})
-
-export async function getCheckoutConfiguration(
-  account: string,
-  adminToken: string
-) {
-  const headers = checkoutHeaders(adminToken)
-  const configuration = await client
-    .get(checkoutUrl(account), { headers })
-    .then(prop('data'))
-
-  return configuration
+/* eslint-disable no-console */
+interface Item {
+  id: string
+  itemPrice: number
+  listPrice: number
+  quantity: number
+  discountPrice: number
 }
-
-export async function checkConfiguration(account: string, adminToken: string) {
-  const config = await getCheckoutConfiguration(account, adminToken)
-  return taxCalculationUrlRegExp(account).test(
-    toString(path(['taxConfiguration', 'url'], config))
-  )
+interface Settings {
+  companyCode: string
 }
-
-export async function activateCheckoutConfiguration(
-  account: string,
-  adminToken: string
+export function toVertex(
+  orderForm: any,
+  saleMessageType: string,
+  settings: Settings
 ) {
-  const config = await getCheckoutConfiguration(account, adminToken)
+  let seller = null
+  const [date] = new Date().toISOString().split('T')
+  let destination: any = {
+    postalCode: orderForm?.shippingDestination?.postalCode ?? '',
+  }
+  const transactionId = orderForm?.orderId ?? ''
+  const [paymentDate] = orderForm?.invoicedDate?.split('T') ?? ''
 
-  const headers = checkoutHeaders(adminToken)
-
-  config.taxConfiguration = {
-    allowExecutionAfterErrors: false,
-    authorizationHeader: '',
-    integratedAuthentication: false,
-    url: taxCalculationUrl(account),
+  if (saleMessageType === 'INVOICE') {
+    destination = {
+      postalCode: orderForm.shippingData.address.postalCode,
+      streetAddress1: orderForm.shippingData.address.street,
+      city: orderForm.shippingData.address.city,
+      country: orderForm.shippingData.address.country,
+    }
+    seller = {
+      company: settings.companyCode,
+    }
   }
 
-  return client.post(checkoutUrl(account), config, { headers })
+  const lineItems = orderForm?.items.map((item: Item, index: number) => {
+    return {
+      customer: {
+        destination,
+      },
+      quantity: {
+        value: item.quantity,
+      },
+      unitPrice:
+        saleMessageType !== 'INVOICE'
+          ? ((item.itemPrice + item.discountPrice) / item.quantity).toFixed(2)
+          : parseInt((item.listPrice / 100).toFixed(2), 10),
+      lineItemNumber:
+        saleMessageType !== 'INVOICE' ? parseInt(item.id, 10) + 1 : index + 1,
+    }
+  })
+
+  lineItems.push({
+    customer: {
+      destination,
+    },
+    product: {
+      productClass: 'SHIPPINGCLASS',
+      value: 'SHIPPING',
+    },
+    quantity: {
+      value: 1,
+    },
+    unitPrice:
+      orderForm.totals.find((item: any) => {
+        return item.id === 'Shipping'
+      }).value / 100,
+    lineItemNumber: parseInt(lineItems.length, 10) + 1,
+  })
+
+  return {
+    seller,
+    saleMessageType,
+    lineItems,
+    documentDate: date,
+    transactionType: 'SALE',
+    transactionId,
+    paymentDate,
+  }
 }
 
-export async function deactivateCheckoutConfiguration(
-  account: string,
-  adminToken: string
-) {
-  const config = await getCheckoutConfiguration(account, adminToken)
+export function fromVertex(vertexObj: any) {
+  const shippingItems = vertexObj.data.lineItems.filter((item: any) => {
+    return String(item.product?.value).toUpperCase() === 'SHIPPING'
+  })
 
-  if (!(await checkConfiguration(account, adminToken))) return
-  config.taxConfiguration.url = null
-  const headers = checkoutHeaders(adminToken)
+  const totalShippingTax = shippingItems.length ? shippingItems[0].totalTax : 0
 
-  return client.post(checkoutUrl(account), config, { headers })
+  const itemTaxResponse = vertexObj.data.lineItems
+    .filter((item: any) => {
+      return String(item.product?.value).toUpperCase() !== 'SHIPPING'
+    })
+    .map((item: any) => {
+      return {
+        id: String(item.lineItemNumber - 1),
+        taxes: item.taxes.map((tax: any) => {
+          return {
+            name: tax.jurisdiction.jurisdictionLevel,
+            description: tax.impositionType.value,
+            value: tax.calculatedTax,
+          }
+        }),
+      }
+    })
+
+  if (totalShippingTax) {
+    itemTaxResponse.forEach((_: any, index: number) => {
+      itemTaxResponse[index].taxes.push({
+        name: 'SHIPPING',
+        description: '',
+        value: (totalShippingTax / itemTaxResponse.length).toFixed(2),
+      })
+    })
+  }
+
+  return {
+    itemTaxResponse,
+    hooks: [],
+  }
 }

@@ -1,28 +1,20 @@
-# [ WORK IN PROGRESS ] Admin Example
+# VERTEX
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 
-An example admin app that adds a menu button to the admin sidebar.
+[![All Contributors](https://img.shields.io/badge/all_contributors-0-orange.svg?style=flat-square)](#contributors-)
 
-# PREVIEW NOTICE :construction:
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-We're working on the **admin builder**, which will allow you to define two files: `admin/routes.json` file with everything you need to create an admin interface (routes paths and components), and `admin/navigation.json` which alows your admin app to insert itself in the sidebar navigation. This is a temporary example!
+The VERTEX Tax Calculator app integrates VTEX checkout and OMS with VERTEX's real-time tax calculation service. It is possible to calculate taxes based on the item being bought, the inventory addresses, and the shipping address.
 
-### How to develop admins
+## Functionalities
+- Calculation of shopping cart taxes
+- Commit these taxes in the VERTEX system at the time the order is invoiced
 
-1. Admins always declare routes in `/admin/app/<route>`
+## Configuration
 
-2. Declare the `admin` builder in your manifest
+1. [Install](https://vtex.io/docs/recipes/development/installing-an-app/) the VERTEX app by running `vtex install vtex.vertex` in your terminal.
 
-3. When installed, the user navigates to `/admin/<route>`, but your app runs in an iframe that points to `/admin/app/<route>`.
-
-4. You can develop directly in the `/admin/app` route for convenience, but don't forget to test it inside the iframe. :)
-
-
-### Quickstart
-
-1. Clone this repo
-
-2. `yarn --cwd react/` for code completion
-
-3. `vtex link`
-
-4. Navigate to `workspace--account.myvtex.com/admin/app/example`
+## How to configure
+After installing the app, head over to the Admin under 'Other' section and access the Vertex app. Then fill in your VERTEX credentials.
+Once you save, it will be active at the checkout flow, if there's another Tax app running, you'll see a confirmation message asking your permission to overwrite the current tax configuration.

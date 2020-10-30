@@ -11,6 +11,7 @@
   "admin/vextex.description": "Connects your store to your VERTEX account",
   "admin/vertex.configuration.title": "Credentials",
   "admin/vertex.configuration.titleHelper": "Request your credentials at cloudsupport@vertexinc.com",
+  "admin/vertex.configuration.companyCode": "Company Code",
   "admin/vertex.configuration.clientId": "Client ID",
   "admin/vertex.configuration.clientToken": "Client Secret",
   "admin/vertex.configuration.apiKey": "API Key",

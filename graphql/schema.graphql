@@ -6,6 +6,7 @@ type Query {
 type Mutation {
   deactivate: String @cacheControl(scope: PRIVATE)
   saveAppSettings(
+    companyCode: String
     clientId: String
     clientToken: String
     apiKey: String
@@ -20,6 +21,7 @@ type MutationResponse {
 }
 
 type SettingsResponse {
+  companyCode: String
   clientId: String
   clientToken: String
   apiKey: String
