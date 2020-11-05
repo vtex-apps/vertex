@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { InstanceOptions, IOContext, ExternalClient } from '@vtex/api'
 
 import { statusToError } from './index'

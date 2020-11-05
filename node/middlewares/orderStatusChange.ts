@@ -1,7 +1,5 @@
-/* eslint-disable no-console */
 import { Apps } from '@vtex/api'
 
-import { getCheckoutConfiguration } from '../resources/checkout'
 import { toVertex } from '../resources/vertex'
 
 const getAppId = (): string => {
@@ -14,11 +12,10 @@ export async function orderStatusChange(
 ) {
   const {
     body,
-    vtex,
-    clients: { vertex, oms },
+    clients: { vertex, oms, checkout },
   } = ctx
 
-  const config = await getCheckoutConfiguration(vtex.account, vtex.authToken)
+  const config = await checkout.getCheckoutConfiguration()
 
   const apps = new Apps(ctx.vtex)
   const app: string = getAppId()
@@ -33,24 +30,11 @@ export async function orderStatusChange(
 
     if (order) {
       const vertexObj = toVertex(order, 'INVOICE', settings)
-      console.log('VERTEX =>', JSON.stringify(vertexObj))
 
       // eslint-disable-next-line @typescript-eslint/camelcase
       const token: any = await vertex.getToken(settings)
 
-      console.log('Settings =>', settings)
-
-      console.log('Token =>', token)
-
-      console.log('Submit tax')
-      await vertex
-        .submitTax(token.access_token, vertexObj)
-        .then((res: any) => {
-          console.log('Vertex response =>', res)
-        })
-        .catch((err: any) => {
-          console.log('Vertex response ERROR =>', err.response.data)
-        })
+      await vertex.submitTax(token.access_token, vertexObj)
     }
   }
 

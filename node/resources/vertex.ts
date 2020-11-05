@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 interface Item {
   id: string
   itemPrice: number

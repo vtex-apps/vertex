@@ -24,11 +24,10 @@
       "name": "update-app-settings"
     },
     {
-      "name": "outbound-access",
-      "attrs": {
-        "host": "{{account}}.vtexcommercestable.com.br",
-        "path": "/api/checkout/pvt/configuration/orderForm"
-      }
+      "name": "OMSViewer"
+    },
+    {
+      "name": "SaveOrderFormConfiguration"
     },
     {
       "name": "outbound-access",
