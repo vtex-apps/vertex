@@ -1,13 +1,6 @@
-/* eslint-disable no-console */
 import { json } from 'co-body'
 import { Apps } from '@vtex/api'
 
-import {
-  getCheckoutConfiguration,
-  activateCheckoutConfiguration,
-  deactivateCheckoutConfiguration,
-  checkConfiguration,
-} from '../resources/checkout'
 import { fromVertex, toVertex } from '../resources/vertex'
 
 const getAppId = (): string => {
@@ -50,6 +43,9 @@ export const resolvers = {
   },
   Mutation: {
     saveAppSettings: async (_: any, params: any, ctx: any) => {
+      const {
+        clients: { checkout },
+      } = ctx
       const apps = new Apps(ctx.vtex)
       const app: string = getAppId()
       const {
@@ -69,10 +65,7 @@ export const resolvers = {
       }
       let ret = { status: 'success', message: '' }
 
-      const config = await getCheckoutConfiguration(
-        ctx.vtex.account,
-        ctx.vtex.authToken
-      )
+      const config = await checkout.getCheckoutConfiguration()
 
       // If not forced and has a conflicted configuration
       if (
@@ -87,20 +80,26 @@ export const resolvers = {
       } else {
         // If it's foced or there's no previous tax configuration
         if (force || !config?.taxConfiguration?.url) {
-          activateCheckoutConfiguration(ctx.vtex.account, ctx.vtex.authToken)
+          checkout.activateCheckoutConfiguration()
         }
         await apps.saveAppSettings(app, newSettings)
       }
       return ret
     },
     deactivate: async (_: any, __: any, ctx: any) => {
-      deactivateCheckoutConfiguration(ctx.vtex.account, ctx.vtex.authToken)
+      const {
+        clients: { checkout },
+      } = ctx
+      checkout.deactivateCheckoutConfiguration()
       return true
     },
   },
   Query: {
     checkConfiguration: async (_: any, __: any, ctx: any) => {
-      return checkConfiguration(ctx.vtex.account, ctx.vtex.authToken)
+      const {
+        clients: { checkout },
+      } = ctx
+      return checkout.checkConfiguration()
     },
     getAppSettings: async (_: any, __: any, ctx: any) => {
       const apps = new Apps(ctx.vtex)

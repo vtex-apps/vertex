@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { FC, useState } from 'react'
 import {
   FormattedMessage,
@@ -76,7 +75,6 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
   const { loading } = useQuery(GET_CONFIG, {
     skip: loadingSave || !!state.clientId,
     onCompleted: (res: any) => {
-      console.log('COMPLETED', res)
       setState({
         ...state,
         ...res.getAppSettings,
@@ -130,8 +128,6 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
       },
     })
   }
-
-  console.log('State =>', state)
 
   return (
     <Layout

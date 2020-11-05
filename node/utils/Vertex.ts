@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { ExternalClient, InstanceOptions, IOContext } from '@vtex/api'
 import { stringify } from 'qs'
 
@@ -8,13 +7,6 @@ export default class RequestVertex extends ExternalClient {
   }
 
   public submitTax(token: any, data: any) {
-    console.log('submitTax => ', {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    })
-
     return this.http.post(
       `https://restconnect.vertexsmb.com/vertex-restapi/v1/sale`,
       data,

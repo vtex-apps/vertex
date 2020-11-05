@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Updated
+- Using checkout as a client
+- Policies
+
 ## [0.0.1] - 2020-10-30
 
 ### Added
