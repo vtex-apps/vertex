@@ -16,5 +16,6 @@
   "admin/vertex.configuration.clientToken": "Client Secret",
   "admin/vertex.configuration.apiKey": "API Key",
   "admin/vertex.configuration.apiPassword": "API Password",
+  "admin/vertex.configuration.submit": "Submit invoiced orders to VERTEX",
   "admin/vertex.configuration.save": "Save"
 }

@@ -9,7 +9,7 @@ The VERTEX Tax Calculator app integrates VTEX checkout and OMS with VERTEX's rea
 
 ## Functionalities
 - Calculation of shopping cart taxes
-- Commit these taxes in the VERTEX system at the time the order is invoiced
+- Commit these taxes in the VERTEX system at the time the order is invoiced (optional)
 
 ## Configuration
 

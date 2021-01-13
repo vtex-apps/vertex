@@ -1,5 +1,3 @@
-import { Apps } from '@vtex/api'
-
 import { toVertex } from '../resources/vertex'
 
 const getAppId = (): string => {
@@ -12,19 +10,19 @@ export async function orderStatusChange(
 ) {
   const {
     body,
-    clients: { vertex, oms, checkout },
+    clients: { vertex, oms, checkout, apps },
   } = ctx
 
   const config = await checkout.getCheckoutConfiguration()
 
-  const apps = new Apps(ctx.vtex)
   const app: string = getAppId()
   const settings = await apps.getAppSettings(app)
 
   if (
     !!config?.taxConfiguration?.url &&
     config.taxConfiguration.url.indexOf('vertex') !== -1 &&
-    body.currentState === 'invoiced'
+    body.currentState === 'invoiced' &&
+    settings.submit
   ) {
     const order = await oms.order(body.orderId)
 

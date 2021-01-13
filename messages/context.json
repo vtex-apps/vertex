@@ -16,5 +16,6 @@
   "admin/vertex.configuration.clientToken": "admin/vertex.configuration.clientToken",
   "admin/vertex.configuration.apiKey": "admin/vertex.configuration.apiKey",
   "admin/vertex.configuration.apiPassword": "admin/vertex.configuration.apiPassword",
+  "admin/vertex.configuration.submit": "admin/vertex.configuration.submit",
   "admin/vertex.configuration.save": "admin/vertex.configuration.save"
 }

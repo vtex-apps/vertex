@@ -12,6 +12,7 @@ import {
   PageHeader,
   ModalDialog,
   Input,
+  Toggle,
   Button,
   Alert,
 } from 'vtex.styleguide'
@@ -34,7 +35,7 @@ const messages: any = defineMessages({
   },
 })
 
-const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
+const AdminVertex: FC<InjectedIntlProps> = ({ intl }) => {
   const [state, setState] = useState<any>({
     isDialogOpen: false,
     companyCode: null,
@@ -42,6 +43,7 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
     clientToken: null,
     apiKey: null,
     apiPassword: null,
+    submit: false,
   })
 
   const [
@@ -92,7 +94,14 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
   }
 
   const handleSave = () => {
-    const { clientId, companyCode, clientToken, apiKey, apiPassword } = state
+    const {
+      clientId,
+      companyCode,
+      clientToken,
+      apiKey,
+      apiPassword,
+      submit,
+    } = state
     saveConfig({
       variables: {
         force: false,
@@ -101,6 +110,7 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
         clientToken,
         apiKey,
         apiPassword,
+        submit,
       },
     })
   }
@@ -116,7 +126,14 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
   }
   const handleForceDialog = () => {
     handleDialogClose()
-    const { clientId, companyCode, clientToken, apiKey, apiPassword } = state
+    const {
+      clientId,
+      companyCode,
+      clientToken,
+      apiKey,
+      apiPassword,
+      submit,
+    } = state
     saveConfig({
       variables: {
         force: true,
@@ -125,6 +142,7 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
         clientToken,
         apiKey,
         apiPassword,
+        submit,
       },
     })
   }
@@ -231,8 +249,24 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
             />
           </div>
           <div className="mb5">
+            <Toggle
+              label={
+                <FormattedMessage id="admin/vertex.configuration.submit" />
+              }
+              disabled={loadingSave || loading}
+              size="large"
+              checked={state.submit}
+              onChange={() =>
+                setState(() => ({
+                  ...state,
+                  submit: !state.submit,
+                }))
+              }
+            />
+          </div>
+          <div className="mb5">
             <Button
-              size="small"
+              size="regular"
               disabled={
                 !state.companyCode ||
                 !state.clientId ||
@@ -281,4 +315,4 @@ const AdminExample: FC<InjectedIntlProps> = ({ intl }) => {
     </Layout>
   )
 }
-export default injectIntl(AdminExample)
+export default injectIntl(AdminVertex)

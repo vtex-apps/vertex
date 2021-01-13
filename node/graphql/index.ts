@@ -1,5 +1,4 @@
 import { json } from 'co-body'
-import { Apps } from '@vtex/api'
 
 import { fromVertex, toVertex } from '../resources/vertex'
 
@@ -9,9 +8,9 @@ const getAppId = (): string => {
 
 export const resolvers = {
   Routes: {
-    orderTaxHandler: async (ctx: any) => {
+    orderTaxHandler: async (ctx: Context) => {
       const {
-        clients: { vertex },
+        clients: { vertex, apps },
       } = ctx
       const checkoutItens = await json(ctx.req)
       let response = JSON.stringify({
@@ -20,12 +19,11 @@ export const resolvers = {
       })
 
       if (checkoutItens?.shippingDestination?.postalCode) {
-        const apps = new Apps(ctx.vtex)
         const app: string = getAppId()
         const settings = await apps.getAppSettings(app)
 
         // eslint-disable-next-line @typescript-eslint/camelcase
-        const { access_token } = await vertex.getToken(settings)
+        const { access_token }: any = await vertex.getToken(settings)
 
         const vertexJson = toVertex(checkoutItens, 'QUOTATION', settings)
 
@@ -42,11 +40,10 @@ export const resolvers = {
     },
   },
   Mutation: {
-    saveAppSettings: async (_: any, params: any, ctx: any) => {
+    saveAppSettings: async (_: any, params: any, ctx: Context) => {
       const {
-        clients: { checkout },
+        clients: { checkout, apps },
       } = ctx
-      const apps = new Apps(ctx.vtex)
       const app: string = getAppId()
       const {
         clientId,
@@ -55,13 +52,16 @@ export const resolvers = {
         apiKey,
         apiPassword,
         force,
+        submit,
       } = params
+
       const newSettings = {
         clientId,
         companyCode,
         clientToken,
         apiKey,
         apiPassword,
+        submit,
       }
       let ret = { status: 'success', message: '' }
 
@@ -79,14 +79,15 @@ export const resolvers = {
         }
       } else {
         // If it's foced or there's no previous tax configuration
+        // eslint-disable-next-line no-lonely-if
         if (force || !config?.taxConfiguration?.url) {
           checkout.activateCheckoutConfiguration()
         }
-        await apps.saveAppSettings(app, newSettings)
       }
+      await apps.saveAppSettings(app, newSettings)
       return ret
     },
-    deactivate: async (_: any, __: any, ctx: any) => {
+    deactivate: async (_: any, __: any, ctx: Context) => {
       const {
         clients: { checkout },
       } = ctx
@@ -95,17 +96,18 @@ export const resolvers = {
     },
   },
   Query: {
-    checkConfiguration: async (_: any, __: any, ctx: any) => {
+    checkConfiguration: async (_: any, __: any, ctx: Context) => {
       const {
         clients: { checkout },
       } = ctx
       return checkout.checkConfiguration()
     },
-    getAppSettings: async (_: any, __: any, ctx: any) => {
-      const apps = new Apps(ctx.vtex)
+    getAppSettings: async (_: any, __: any, ctx: Context) => {
+      const {
+        clients: { apps },
+      } = ctx
       const app: string = getAppId()
       const settings = await apps.getAppSettings(app)
-
       return settings
     },
   },

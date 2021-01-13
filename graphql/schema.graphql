@@ -12,6 +12,7 @@ type Mutation {
     apiKey: String
     apiPassword: String
     force: Boolean
+    submit: Boolean
   ): MutationResponse @cacheControl(scope: PRIVATE)
 }
 
@@ -26,4 +27,5 @@ type SettingsResponse {
   clientToken: String
   apiKey: String
   apiPassword: String
+  submit: Boolean
 }

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+- Toggle option to allow invoiced orders to be sent to VERTEX
+
 ## [0.1.0] - 2020-11-05
 
 ### Updated
