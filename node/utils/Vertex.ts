@@ -19,6 +19,19 @@ export default class RequestVertex extends ExternalClient {
     )
   }
 
+  public addressLookup(token: any, data: any) {
+    return this.http.post(
+      `https://restconnect.vertexsmb.com/vertex-restapi/v1/addresslookup`,
+      data,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+  }
+
   public getToken(settings: any) {
     const credentials = {
       client_id: settings.clientId,

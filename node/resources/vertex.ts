@@ -4,6 +4,11 @@ interface Item {
   listPrice: number
   quantity: number
   discountPrice: number
+  address: Address
+}
+
+interface Address {
+  taxAreaId: number
 }
 interface Settings {
   companyCode: string
@@ -34,7 +39,7 @@ export function toVertex(
   }
 
   const lineItems = orderForm?.items.map((item: Item, index: number) => {
-    return {
+    const ret: any = {
       customer: {
         destination,
       },
@@ -48,6 +53,16 @@ export function toVertex(
       lineItemNumber:
         saleMessageType !== 'INVOICE' ? parseInt(item.id, 10) + 1 : index + 1,
     }
+
+    if (item?.address?.taxAreaId) {
+      ret.seller = {
+        physicalOrigin: {
+          taxAreaId: item.address.taxAreaId,
+        },
+      }
+    }
+
+    return ret
   })
 
   lineItems.push({

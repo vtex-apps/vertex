@@ -10,22 +10,80 @@ export const resolvers = {
   Routes: {
     orderTaxHandler: async (ctx: Context) => {
       const {
-        clients: { vertex, apps },
+        clients: { vertex, apps, dock },
       } = ctx
-      const checkoutItens = await json(ctx.req)
+      const checkoutItems: any = await json(ctx.req)
       let response = JSON.stringify({
         itemTaxResponse: [],
         hooks: [],
       })
+      const app: string = getAppId()
+      const settings = await apps.getAppSettings(app)
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      const { access_token }: any = await vertex.getToken(settings)
+      const dockAddress: any = {}
+      const dockPromise: any = []
+      const lookupPromise: any = []
+      let itemsWithAddress = []
 
-      if (checkoutItens?.shippingDestination?.postalCode) {
-        const app: string = getAppId()
-        const settings = await apps.getAppSettings(app)
+      if (checkoutItems?.items?.length) {
+        checkoutItems.items.map(async (item: any) => {
+          if (!dockAddress[item.dockId]) {
+            dockPromise.push(
+              dock.get(item.dockId).then((ret: any) => {
+                dockAddress[item.dockId] = ret.address
+              })
+            )
+          }
+        })
+      }
 
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        const { access_token }: any = await vertex.getToken(settings)
+      await Promise.all(dockPromise)
 
-        const vertexJson = toVertex(checkoutItens, 'QUOTATION', settings)
+      checkoutItems.items.map(async (item: any) => {
+        // eslint-disable-next-line vtex/prefer-early-return
+        if (dockAddress[item.dockId] && !dockAddress[item.dockId].taxAreaId) {
+          const {
+            postalCode,
+            city,
+            state,
+            street,
+            complement,
+            number,
+            country: { acronym: countryName },
+          } = dockAddress[item.dockId]
+          const [asOfDate] = new Date().toISOString().split('T')
+          lookupPromise.push(
+            vertex
+              .addressLookup(access_token, {
+                postalAddress: {
+                  streetAddress1: `${number} ${street}`,
+                  streetAddress2: complement,
+                  city,
+                  mainDivision: state,
+                  subDivision: city,
+                  postalCode,
+                  country: countryName,
+                },
+                asOfDate,
+              })
+              .then((result: any) => {
+                const [data] = result.data.lookupResults
+                dockAddress[item.dockId].taxAreaId = data.taxAreaId
+              })
+          )
+        }
+      })
+
+      await Promise.all(lookupPromise).then(() => {
+        itemsWithAddress = checkoutItems.items.map((item: any) => {
+          return { ...item, address: dockAddress[item.dockId] }
+        })
+        checkoutItems.items = itemsWithAddress
+      })
+
+      if (checkoutItems?.shippingDestination?.postalCode) {
+        const vertexJson = toVertex(checkoutItems, 'QUOTATION', settings)
 
         const quote = await vertex.submitTax(access_token, vertexJson)
 
