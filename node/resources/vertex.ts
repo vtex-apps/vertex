@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 interface Item {
   id: string
   itemPrice: number
@@ -109,9 +110,10 @@ export function fromVertex(vertexObj: any) {
       return {
         id: String(item.lineItemNumber - 1),
         taxes: item.taxes.map((tax: any) => {
+          console.log('Tax =>', tax)
           return {
             name: tax.jurisdiction.jurisdictionLevel,
-            description: tax.impositionType.value,
+            description: tax.impositionType?.value,
             value: tax.calculatedTax,
           }
         }),
