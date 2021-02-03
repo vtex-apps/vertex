@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { json } from 'co-body'
 
 import { fromVertex, toVertex } from '../resources/vertex'
@@ -9,10 +10,12 @@ const getAppId = (): string => {
 export const resolvers = {
   Routes: {
     orderTaxHandler: async (ctx: Context) => {
+      console.log('orderTaxHandler')
       const {
         clients: { vertex, apps, dock },
       } = ctx
       const checkoutItems: any = await json(ctx.req)
+      console.log('checkoutItems =>', checkoutItems)
       let response = JSON.stringify({
         itemTaxResponse: [],
         hooks: [],
@@ -21,6 +24,8 @@ export const resolvers = {
       const settings = await apps.getAppSettings(app)
       // eslint-disable-next-line @typescript-eslint/camelcase
       const { access_token }: any = await vertex.getToken(settings)
+
+      console.log('Vertex access_token', access_token)
       const dockAddress: any = {}
       const dockPromise: any = []
       const lookupPromise: any = []
@@ -85,9 +90,11 @@ export const resolvers = {
       if (checkoutItems?.shippingDestination?.postalCode) {
         const vertexJson = toVertex(checkoutItems, 'QUOTATION', settings)
 
+        console.log('vertexJson =>', vertexJson)
         const quote = await vertex.submitTax(access_token, vertexJson)
 
         response = JSON.stringify(fromVertex(quote))
+        console.log('fromVertex =>', response)
       }
 
       ctx.set('Content-Type', 'application/vnd.vtex.checkout.minicart.v1+json')
