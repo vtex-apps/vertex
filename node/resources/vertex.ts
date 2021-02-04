@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 interface Item {
   id: string
   itemPrice: number
@@ -19,25 +18,20 @@ export function toVertex(
   saleMessageType: string,
   settings: Settings
 ) {
-  let seller = null
-  const [date] = new Date().toISOString().split('T')
-  let destination: any = {
-    postalCode: orderForm?.shippingDestination?.postalCode ?? '',
+  const seller = {
+    company: settings.companyCode,
   }
+  const [date] = new Date().toISOString().split('T')
+  const destination: any = {
+    postalCode: orderForm?.shippingDestination?.postalCode ?? '',
+    streetAddress1: orderForm?.shippingDestination?.street,
+    city: orderForm?.shippingDestination?.city,
+    mainDivision: orderForm?.shippingDestination?.state,
+    country: orderForm?.shippingDestination?.country,
+  }
+
   const transactionId = orderForm?.orderId ?? ''
   const [paymentDate] = orderForm?.invoicedDate?.split('T') ?? ''
-
-  if (saleMessageType === 'INVOICE') {
-    destination = {
-      postalCode: orderForm.shippingData.address.postalCode,
-      streetAddress1: orderForm.shippingData.address.street,
-      city: orderForm.shippingData.address.city,
-      country: orderForm.shippingData.address.country,
-    }
-    seller = {
-      company: settings.companyCode,
-    }
-  }
 
   const lineItems = orderForm?.items.map((item: Item, index: number) => {
     const ret: any = {
@@ -110,7 +104,6 @@ export function fromVertex(vertexObj: any) {
       return {
         id: String(item.lineItemNumber - 1),
         taxes: item.taxes.map((tax: any) => {
-          console.log('Tax =>', tax)
           return {
             name: tax.jurisdiction.jurisdictionLevel,
             description: tax.impositionType?.value,
