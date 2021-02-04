@@ -1,7 +1,7 @@
 {
   "name": "vertex",
   "vendor": "vtex",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "title": "VERTEX Cloud integration",
   "description": "",
   "mustUpdateAt": "2022-08-28",
